@@ -27,4 +27,4 @@ jobs:
         run: npm ci
         working-directory: ./functions
       - name: Deploy Cloud Functions
-        run: GOOGLE_APPLICATION_CREDENTIALS=$HOME/Downloads/femto-sh-3272be9227c9.json npx firebase-tools deploy --only functions --project femto-sh --debug
+        run: npx firebase-tools deploy --only functions --json
