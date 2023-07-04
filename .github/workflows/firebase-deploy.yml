@@ -16,7 +16,7 @@ jobs:
           create_credentials_file: true
       - uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - uses: actions/cache@v3
         with:
           path: ~/.npm
@@ -27,4 +27,4 @@ jobs:
         run: npm ci
         working-directory: ./functions
       - name: Deploy Cloud Functions
-        run: npx firebase-tools deploy --only functions --json
+        run: GOOGLE_APPLICATION_CREDENTIALS=$HOME/Downloads/femto-sh-3272be9227c9.json npx firebase-tools deploy --only functions --project femto-sh --debug
