@@ -26,6 +26,5 @@ jobs:
       - name: Build Cloud Functions
         run: npm ci
         working-directory: ./functions
-      - run: cat $GOOGLE_APPLICATION_CREDENTIALS
       - name: Deploy Cloud Functions
-        run: npx firebase-tools deploy --only functions
+        run: npx firebase-tools deploy --only functions --json
