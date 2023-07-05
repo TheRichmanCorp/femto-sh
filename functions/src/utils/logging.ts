@@ -1,6 +1,7 @@
 import { createLogger, transports, format } from "winston";
 import { SeqTransport } from '@datalust/winston-seq';
 import { LoggingWinston } from '@google-cloud/logging-winston';
+import winston from "winston/lib/winston/config";
 
 
 const SEQ_SERVER = process.env.SEQ_SERVER ?? ''
@@ -35,11 +36,12 @@ export type LoggingMetadata = {
   country?: number;
 };
 
+//Todo: prevent  MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close listeners added to [SeqTransport]
 export const getLogger = (metadata?: LoggingMetadata) => {
   const defaultMetadata = {
     application: process.env.APPLICATION_NAME,
   }
-
+  //private static logger: winston.Logger;
   const parameterizeMetadata = metadata ?? { service: 'core' }
   const allowTransport = []
   if (process.env.LOG_TO_CONSOLE === '1') allowTransport.push(new transports.Console())

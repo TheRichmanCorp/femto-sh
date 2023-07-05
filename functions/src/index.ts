@@ -39,4 +39,5 @@ const verifySubscription = (req: Request, res: Response<any>) => {
     logger.error('Failed validation. Make sure the validation tokens match.')
     res.sendStatus(403)
   }
+  logger.close()
 }
