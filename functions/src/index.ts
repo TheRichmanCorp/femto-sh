@@ -16,6 +16,7 @@ export const messengerWebhook = onRequest(async (req, res) => {
   }
 })
 
+// Messenger Verify Webhook Subscription
 const verifySubscription = (req: Request, res: Response<any>) => {
   const metadata: LoggingMetadata = { service: "webhook-verify" }
   const logger = getLogger(metadata)
