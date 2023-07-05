@@ -1,19 +1,43 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import { Request, onRequest } from "firebase-functions/v2/https"
+import { Response } from "firebase-functions/v1"
+import { getLogger } from "./utils/logging"
 
-import {onRequest} from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger";
+import type { LoggingMetadata } from "./utils/logging"
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+export const messengerWebhook = onRequest(async (req, res) => {
+  switch (req.method) {
+    case 'GET':
+      verifySubscription(req, res)
+      break
+    case 'POST':
+      //webhookImpl(req, res)
+      break
+  }
+})
+
+const verifySubscription = (req: Request, res: Response<any>) => {
+  const metadata: LoggingMetadata = { service: "webhook-verify" }
+  const logger = getLogger(metadata)
+
+  logger.info('[{service}] Incoming webhook verification request')
+  const verifyToken = process.env.FACEBOOK_WEBHOOK_VERIFY_TOKEN ?? ''
+
+  // Verify token not exist, abort request
+  if (verifyToken === '') {
+    logger.error('VERIFY_TOKEN not exists')
+    res.status(405).send("VERIFY_TOKEN not set").end()
+    return
+  }
+
+  // Verify Facebook Webhook Subscriptions
+  if (req.query['hub.mode'] === 'subscribe' &&
+    req.query['hub.verify_token'] === verifyToken) {
+    logger.info('Successfully validating webhook token')
+    res.status(200).send(req.query['hub.challenge'])
+  } else {
+    logger.error('Failed validation. Make sure the validation tokens match.')
+    res.sendStatus(403)
+  }
+  logger.close()
+}

@@ -1,0 +1,30 @@
+name: Deploy Cloud Functions
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+          create_credentials_file: true
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 18.x
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/femto/functions/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Build Cloud Functions
+        run: npm ci
+        working-directory: ./functions
+      - name: Deploy Cloud Functions
+        run: npx firebase-tools deploy --only functions --json
